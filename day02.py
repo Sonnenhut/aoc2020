@@ -26,7 +26,7 @@ def part2():
     return cnt
 
 
-#582
+# 582
 print(part1())
-#729
+# 729
 print(part2())
