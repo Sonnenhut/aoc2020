@@ -1,5 +1,5 @@
 # 2019 day 1
-input = list(map(int, open("inputs/day00.txt", "r").read().splitlines()))
+inp = list(map(int, open("inputs/day00.txt", "r").read().splitlines()))
 
 
 def fuel(mass): return mass // 3 - 2
@@ -14,14 +14,14 @@ def recursive_fuel(mass):
 
 def pt1():
     total = 0
-    for m in input:
+    for m in inp:
         total += fuel(m)
     return total
 
 
 def pt2():
     total = 0
-    for m in input:
+    for m in inp:
         total += recursive_fuel(m)
     return total
 

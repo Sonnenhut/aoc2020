@@ -1,14 +1,14 @@
-input = open("inputs/day03.txt", "r").read().splitlines()
+inp = open("inputs/day03.txt", "r").read().splitlines()
 
 
 def part1(right_step, down_step):
     res = 0
-    max_right = len(input[0])
+    max_right = len(inp[0])
     right = right_step
     down = down_step
 
-    while down < len(input):
-        if input[down][right] == '#':
+    while down < len(inp):
+        if inp[down][right] == '#':
             res += 1
         down += down_step
         right = (right + right_step) % max_right

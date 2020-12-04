@@ -1,9 +1,9 @@
-input = open("inputs/day02.txt", "r").read().splitlines()
+inp = open("inputs/day02.txt", "r").read().splitlines()
 
 
 def part1():
     cnt = 0
-    for line in input:
+    for line in inp:
         line = line.replace("\n", "")
         [desc, pw] = line.split(": ")
         [amount, char] = desc.split(" ")
@@ -16,7 +16,7 @@ def part1():
 
 def part2():
     cnt = 0
-    for line in input:
+    for line in inp:
         line = line.replace("\n", "")
         [desc, pw] = line.split(": ")
         [amount, char] = desc.split(" ")
