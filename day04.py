@@ -85,6 +85,5 @@ def part2():
 
 # 182
 print(part1())
-
 # 109
 print(part2())

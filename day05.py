@@ -32,13 +32,8 @@ def part2():
             res = idx
     return res
 
+
 # 913
 print(part1())
 # not 4, not 8
 print(part2())
-
-# 1 - 128
-# 1-64, 65-128
-# 1-32,33-64,  65-97,98-128
-
-# test if code works for row 0 FFFFFFFF
