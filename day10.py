@@ -14,11 +14,11 @@ def part1():
 
 
 @functools.cache
-def cumulative_connections_to(csr, adapters):
+def count_chain_combinations(given_jolt, adapters):
     res = 0
-    next_adapters = set(adapters) & set(range(csr + 1, csr + 4))
+    next_adapters = set(adapters) & set(range(given_jolt + 1, given_jolt + 4))
     for next_adapter in next_adapters:
-        down = cumulative_connections_to(next_adapter, adapters)
+        down = count_chain_combinations(next_adapter, adapters)
         res += down
 
     if len(next_adapters) == 0:
@@ -31,7 +31,7 @@ def cumulative_connections_to(csr, adapters):
 def part2():
     adapters = parse_input("inputs/day10.txt")
     adapter_combinations = [0] + adapters + [max(adapters) + 3]
-    return cumulative_connections_to(0, frozenset(adapter_combinations))
+    return count_chain_combinations(0, frozenset(adapter_combinations))
 
 
 # 1917
