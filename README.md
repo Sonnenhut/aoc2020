@@ -7,3 +7,4 @@ things I learned:
  - Most of the time code readability > performance (it can be X times more performant, but who would still understand the code?)
  - Out of the box memoization with [@functools.cache](https://docs.python.org/3/library/functools.html#functools.cache) (when arguments are hashable) 
  - itertools has some nice functions like [combinations](https://docs.python.org/3/library/itertools.html#itertools.combinations)
+ - [list comprehensions](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions) instead of `list(map(lambda: foo * 2,bar))` you can do `[foo * 2 for foo in bar]`
