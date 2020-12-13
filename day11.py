@@ -4,7 +4,8 @@ import itertools
 def cycle(state, calc):
     new_state = []
     for y in range(len(state)):
-        new_state.append([calc(x, y, state) for x in range(len(state[y]))])
+        line = [calc(x, y, state) for x in range(len(state[y]))]
+        new_state.append(line)
     return new_state
 
 
