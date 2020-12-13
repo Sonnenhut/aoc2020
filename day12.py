@@ -1,9 +1,5 @@
-def parse_input(file_name):
-    return open(file_name, "r").read().splitlines()
-
-
 def part1():
-    instructions = parse_input("inputs/day12.txt")
+    instructions = open("inputs/day12.txt").read().splitlines()
     x, y = (0, 0)
     facing = 'E'
     for instruction in instructions:
@@ -39,7 +35,7 @@ def apply_instruction_pt1(facing, instruction):
 
 
 def part2():
-    instructions = parse_input("inputs/day12.txt")
+    instructions = open("inputs/day12.txt").read().splitlines()
     wp_x, wp_y = (10, -1)
     x, y = (0, 0)
     for instruction in instructions:
@@ -81,18 +77,11 @@ def rotate(instruction, position):
     if action == 'R':
         times = value / 90
         for _ in range(int(times)):
-            x, y = rotate90cw(x, y)
+            x, y = -y, x
     elif action == 'L':
         times = (360 - value) / 90
         for _ in range(int(times)):
-            x, y = rotate90cw(x, y)
-    return x, y
-
-
-def rotate90cw(x, y):
-    tmp_x = x
-    x = -y
-    y = tmp_x
+            x, y = -y, x
     return x, y
 
 

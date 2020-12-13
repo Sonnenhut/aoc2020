@@ -1,10 +1,6 @@
 import itertools
 
 
-def parse_input(file_name):
-    return open(file_name, "r").read().splitlines()
-
-
 def cycle(state, calc):
     new_state = []
     for y in range(len(state)):
@@ -39,7 +35,7 @@ def adjacent_occupied(x, y, desired_occupied, state):
 
 
 def part1():
-    state = parse_input("inputs/day11.txt")
+    state = open("inputs/day11.txt").read().splitlines()
     prev_state = []
     while state != prev_state:
         prev_state = state
@@ -48,7 +44,7 @@ def part1():
 
 
 def part2():
-    state = parse_input("inputs/day11.txt")
+    state = open("inputs/day11.txt").read().splitlines()
     prev_state = []
     while state != prev_state:
         prev_state = state

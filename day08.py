@@ -52,12 +52,8 @@ class Pgm(object):
         return self.acc_value
 
 
-def parse_input(file_name):
-    return open(file_name, "r").read().splitlines()
-
-
 def part1():
-    pgm = Pgm(parse_input("inputs/day08.txt"))
+    pgm = Pgm(open("inputs/day08.txt").read().splitlines())
     return pgm.exec_until_infinite_loop()
 
 
@@ -76,7 +72,7 @@ def input_mutations(input_lines):
 def part2():
     res = -1
     # try out all mutations of jmp -> nop / nop -> jmp
-    for mutation in input_mutations(parse_input("inputs/day08.txt")):
+    for mutation in input_mutations(open("inputs/day08.txt").read().splitlines()):
         try:
             res = Pgm(mutation).exec()
         except InfiniteLoopError:
