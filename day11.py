@@ -65,41 +65,30 @@ def calc_seat_part2(x, y, state):
 
 
 def visible_occupied(x, y, desired_occupied, state):
-    minx = 0
-    stopx = len(state[0])
-    miny = 0
-    stopy = len(state)
-
-    up_y = list(reversed(range(miny, y)))
-    down_y = list(range(y + 1, stopy))
-    left_x = list(reversed(range(minx, x)))
-    right_x = list(range(x + 1, stopx))
-
-    directions = [
-        zip(itertools.repeat(x), up_y),
-        zip(itertools.repeat(x), down_y),
-        zip(left_x, itertools.repeat(y)),
-        zip(right_x, itertools.repeat(y)),
-        zip(left_x, up_y),
-        zip(right_x, up_y),
-        zip(left_x, down_y),
-        zip(right_x, down_y),
-    ]
+    checks = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
     res = 0
-    for direction in directions:
-        for pos_x, pos_y in direction:
-            char = state[pos_y][pos_x]
-            if '.' == char:
-                continue
-            elif 'L' == char:
+    for x_off, y_off in checks:
+        vis = visible_in_direction(x, y, x_off, y_off, state)
+        if 'L' == vis:
+            continue
+        elif '#' == vis:
+            res += 1
+            if res == desired_occupied:
                 break
-            elif '#' == char:
-                res += 1
-                if res == desired_occupied:
-                    return res
-                else:
-                    break
+    return res
+
+
+def visible_in_direction(x, y, x_off, y_off, state):
+    pos_x = x + x_off
+    pos_y = y + y_off
+    res = '.'
+    if 0 <= pos_x < len(state[0]) and 0 <= pos_y < len(state):
+        char = state[pos_y][pos_x]
+        if '#' == char or 'L' == char:
+            res = char
+        else:
+            res = visible_in_direction(pos_x, pos_y, x_off, y_off, state)
     return res
 
 
