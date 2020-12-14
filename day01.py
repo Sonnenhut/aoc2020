@@ -1,7 +1,9 @@
-inp = sorted(list(map(int, open("inputs/day01.txt", "r").read().splitlines())))
+def parse_input(filename):
+    return sorted(list(map(int, open(filename, "r").read().splitlines())))
 
 
 def pt1():
+    inp = parse_input("inputs/day01.txt")
     for ex1 in inp:
         for ex2 in inp:
             if ex1 + ex2 == 2020:
@@ -10,6 +12,7 @@ def pt1():
 
 
 def pt2():
+    inp = parse_input("inputs/day01.txt")
     for ex1 in inp:
         for ex2 in inp:
             for ex3 in inp:

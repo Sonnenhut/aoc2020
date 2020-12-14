@@ -11,6 +11,7 @@ def is_num_in_range(v, mini, maxi):
     except ValueError:
         return 0
 
+
 def byr(v):
     return is_num_in_range(v, 1920, 2002)
 

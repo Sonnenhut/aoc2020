@@ -22,7 +22,7 @@ def count_chain_combinations(given_jolt, adapters):
         res += down
 
     if len(next_adapters) == 0:
-        # chain reached the end, increase the count!
+        # chain reached the end, it counts as one possible combination!
         res += 1
 
     return res
