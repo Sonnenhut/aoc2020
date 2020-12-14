@@ -13,25 +13,10 @@ def calc_seat_part1(x, y, state):
     curr = state[y][x]
     res = curr
 
-    if curr == 'L' and adjacent_occupied(x, y, 1, state) == 0:
+    if curr == 'L' and visible_occupied(x, y, 1, state, 0) == 0:
         res = '#'
-    elif curr == '#' and adjacent_occupied(x, y, 4, state) >= 4:
+    elif curr == '#' and visible_occupied(x, y, 4, state, 0) >= 4:
         res = 'L'
-    return res
-
-
-def adjacent_occupied(x, y, desired_occupied, state):
-    res = 0
-    maxx = len(state[0])
-    maxy = len(state)
-
-    for pos_x, pos_y in itertools.product(range(x - 1, x + 2), range(y - 1, y + 2)):
-        if pos_y < 0 or pos_x < 0 or pos_y >= maxy or pos_x >= maxx:
-            continue
-        elif state[pos_y][pos_x] == '#' and (pos_x, pos_y) != (x, y):
-            res += 1
-            if res == desired_occupied:
-                break
     return res
 
 
@@ -64,12 +49,12 @@ def calc_seat_part2(x, y, state):
     return res
 
 
-def visible_occupied(x, y, desired_occupied, state):
+def visible_occupied(x, y, desired_occupied, state, search_depth=1):
     checks = [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]
 
     res = 0
     for x_off, y_off in checks:
-        vis = visible_in_direction(x, y, x_off, y_off, state)
+        vis = visible_in_direction(x, y, x_off, y_off, state, search_depth)
         if 'L' == vis:
             continue
         elif '#' == vis:
@@ -79,7 +64,7 @@ def visible_occupied(x, y, desired_occupied, state):
     return res
 
 
-def visible_in_direction(x, y, x_off, y_off, state):
+def visible_in_direction(x, y, x_off, y_off, state, recursive=1):
     pos_x = x + x_off
     pos_y = y + y_off
     res = '.'
@@ -87,8 +72,8 @@ def visible_in_direction(x, y, x_off, y_off, state):
         char = state[pos_y][pos_x]
         if '#' == char or 'L' == char:
             res = char
-        else:
-            res = visible_in_direction(pos_x, pos_y, x_off, y_off, state)
+        elif recursive == 1:
+            res = visible_in_direction(pos_x, pos_y, x_off, y_off, state, recursive)
     return res
 
 

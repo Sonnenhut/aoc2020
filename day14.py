@@ -45,9 +45,10 @@ def bitwise_combinations(floating, base):
 
 
 def mask_rules(text):
-    positions_to_1 = [m.start() for m in re.finditer("1", text[::-1])]
-    positions_to_0 = [m.start() for m in re.finditer("0", text[::-1])]
-    positions_floating = [m.start() for m in re.finditer("X", text[::-1])]
+    mask_bits = text[::-1]
+    positions_to_1 = [m.start() for m in re.finditer("1", mask_bits)]
+    positions_to_0 = [m.start() for m in re.finditer("0", mask_bits)]
+    positions_floating = [m.start() for m in re.finditer("X", mask_bits)]
     return positions_to_0, positions_to_1, positions_floating
 
 
