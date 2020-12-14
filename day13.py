@@ -18,39 +18,37 @@ def part2():
     buses = buses.split(",")
 
     sorted_buses = filter(lambda b: b != 'x', buses)
-    sorted_buses = map(lambda b: (b, buses.index(b)), sorted_buses)
-    sorted_buses = list(reversed(sorted(map(lambda pair: (int(pair[0]), pair[1]), sorted_buses))))
+    sorted_buses = list(map(lambda bus: (int(bus), buses.index(bus)), sorted_buses))
 
-    big_buses = sorted_buses[:4]
-    # find a relatively high point where big numbers match the criteria
-    curr = increase_until_buses_meet(0, *big_buses[0], big_buses)
+    increase, _ = sorted_buses[0]
+    curr = 0
 
-    # from that matching point onwards all of the next "meeting points" will be in steps of the lcm
-    # happily enough the lcm will be huge, as we do this step for the big bus numbers
-    increase = math.lcm(*[pair[0] for pair in big_buses])
+    for stop in range(2, len(sorted_buses) + 1):
+        view = sorted_buses[:stop]
 
-    # from the point where some (big) numbers match the criteria go in big increase steps and search for a lucky match
-    curr_base = increase_until_buses_meet(curr, increase, 0, sorted_buses)
+        # find the time where some of the buses meet
+        curr = increase_until_buses_meet(curr, increase, view)
 
-    return curr_base
+        # found the time where the buses meet, from there on, these buses will meet at that point + multiple of lcm
+        increase = math.lcm(*[pair[0] for pair in view])
+
+    return curr
 
 
-def increase_until_buses_meet(start, step, step_offset, buses):
+def increase_until_buses_meet(start, step, buses):
     curr = start + step
-    curr_base = curr - step_offset
     offset_to_wanted = -1
     while offset_to_wanted != 0:
         curr += step
-        curr_base = curr - step_offset
 
         offset_to_wanted = 0
         for bus, bus_offset in buses:
             # is the bus in the correct place?
-            offset_to_wanted += (curr_base + bus_offset) % bus
+            offset_to_wanted += (curr + bus_offset) % bus
             if offset_to_wanted > 0:
                 break
 
-    return curr_base
+    return curr
 
 
 # 2845
