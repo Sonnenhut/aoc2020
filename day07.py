@@ -11,7 +11,6 @@ def parse_file(name):
     return res
 
 
-# @functools.cache could squeeze out a bit of performance here
 def flatten_bag(name, rules, override_amt=None):
     res = []
     for (amt, contained_name) in rules[name]:

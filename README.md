@@ -8,4 +8,4 @@ things I learned:
  - Out of the box memoization with [@functools.cache](https://docs.python.org/3/library/functools.html#functools.cache) (when arguments are hashable) 
  - itertools has some nice functions like [combinations](https://docs.python.org/3/library/itertools.html#itertools.combinations)
  - [list comprehensions](https://docs.python.org/3/tutorial/datastructures.html#list-comprehensions) instead of `list(map(lambda: foo * 2,bar))` you can do `[foo * 2 for foo in bar]`
- - Reversing a string or array with `"Hello World"[::-1]`, which means: start at 0 until the end and step with an increase of -1 (this works because "Hello World"[-1] will look at the last index -1)
+ - Reversing a string or array with `"Hello World"[::-1]`, which means: start at 0 until the end and step with an increase of -1 (this works because `"Hello World"[-1]` will look at the last index -1)
