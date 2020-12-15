@@ -1,18 +1,11 @@
 import sys
 from operator import sub
 
-
-inp = list(map(int, "9,12,1,4,17,0,18".split(",")))
+inp = list(map(int, open("inputs/day15.txt").read().replace("\n", "").split(",")))
 
 
 def spoken_at_turn(wanted_turn):
-    res = -1
-    for turn, spoken in enumerate(gen(inp), 1):
-        if turn == wanted_turn:
-            res = spoken
-            break
-
-    return res
+    return next(x for i, x in enumerate(gen(inp), 1) if i == wanted_turn)
 
 
 def part1():
@@ -29,17 +22,17 @@ def gen(initial):
         memory[speak] = (iturn, 0)
         yield speak
 
-    last = initial[-1]
+    spoken_at = memory[initial[-1]]
     for turn in range(len(initial) + 1, sys.maxsize):
-        last_spoken_at = memory.get(last, (0, 0))
-        if 0 in last_spoken_at:
+        if 0 in spoken_at:
             speak = 0
         else:
-            speak = sub(*last_spoken_at)
+            speak = sub(*spoken_at)
 
-        last_turn, before_turn = memory.get(speak, (0, 0))
-        memory[speak] = (turn, last_turn)
-        last = speak
+        last_turn, _ = memory.get(speak, (0, 0))
+        spoken_at = (turn, last_turn)
+        memory[speak] = spoken_at
+
         yield speak
 
 
