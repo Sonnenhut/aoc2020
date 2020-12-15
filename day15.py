@@ -1,5 +1,4 @@
 import sys
-from operator import sub
 
 inp = list(map(int, open("inputs/day15.txt").read().replace("\n", "").split(",")))
 
@@ -19,21 +18,23 @@ def part2():
 def gen(initial):
     memory = {}
     for iturn, speak in enumerate(initial, 1):
-        memory[speak] = (iturn, 0)
+        memory[speak] = iturn
         yield speak
 
-    spoken_at = memory[initial[-1]]
-    for turn in range(len(initial) + 1, sys.maxsize):
-        if 0 in spoken_at:
+    start_turn = len(initial) + 1
+    spoken_last = initial[-1]
+    for turn in range(start_turn, sys.maxsize):
+        last_turn = turn - 1
+        spoken_memory = memory.get(spoken_last, None)
+        if spoken_memory is None or turn == start_turn:
             speak = 0
         else:
-            speak = sub(*spoken_at)
-
-        last_turn, _ = memory.get(speak, (0, 0))
-        spoken_at = (turn, last_turn)
-        memory[speak] = spoken_at
+            speak = last_turn - spoken_memory
 
         yield speak
+
+        memory[spoken_last] = last_turn
+        spoken_last = speak
 
 
 # 610
