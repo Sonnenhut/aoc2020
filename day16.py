@@ -24,19 +24,19 @@ def str_to_range(text):
 def parse_nearby_tickets(blocks):
     nearby_tickets = parse_tickets(blocks[2])
 
-    res_invalid_fields = []
-    res_tickets = []
+    invalid_fields = []
+    res = []
     rule_values = parse_rules(blocks).values()
     for ticket in nearby_tickets:
-        valid_parts = set()
+        valid_ticket_fields = set()
         for rule in rule_values:
-            valid_parts |= set(calc_valid_ticket_parts(ticket, rule))
+            valid_ticket_fields |= set(calc_valid_ticket_parts(ticket, rule))
 
-        res_invalid_fields += set(ticket).difference(valid_parts)
-        if set(ticket) == valid_parts:
-            res_tickets.append(ticket)
+        invalid_fields += set(ticket).difference(valid_ticket_fields)
+        if set(ticket) == valid_ticket_fields:
+            res.append(ticket)
 
-    return res_tickets, res_invalid_fields
+    return res, invalid_fields
 
 
 def calc_invalid_ticket_parts(ticket, rule_ranges):
@@ -90,10 +90,9 @@ def shorten_field_indices(init_mapping):
     remaining = {key: set(init_mapping[key]) for key in init_mapping.keys()}
     res = {}
     while len(res) != len(init_mapping):
-        with_one_elem = [key for key in remaining.keys() if len(remaining[key]) == 1]
-        name = with_one_elem[0]
-        assigned_value = [*remaining.pop(name)][0]
-        res[name] = assigned_value
+        fieldname = [key for key in remaining.keys() if len(remaining[key]) == 1][0]
+        assigned_value = [*remaining.pop(fieldname)][0]
+        res[fieldname] = assigned_value
         for values in remaining.values():
             values.remove(assigned_value)
 
