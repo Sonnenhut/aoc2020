@@ -1,6 +1,3 @@
-import itertools
-
-
 def cycle(state, calc):
     new_state = []
     for y in range(len(state)):
