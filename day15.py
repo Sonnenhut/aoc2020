@@ -31,6 +31,6 @@ def gen(initial):
 
 
 # part1_ 610
-spoken_at_turn(2020)
+print(spoken_at_turn(2020))
 # part2: 1407
-spoken_at_turn(30000000)
+print(spoken_at_turn(30000000))

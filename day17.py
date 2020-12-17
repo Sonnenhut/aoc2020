@@ -14,7 +14,7 @@ def solve(part=1):
     return len(world)
 
 
-def all_locations(tuples):
+def all_locations(tuples, skip_4d=False):
     maxv = [-sys.maxsize, -sys.maxsize, -sys.maxsize, -sys.maxsize]
     minv = [sys.maxsize, sys.maxsize, sys.maxsize, sys.maxsize]
 
@@ -29,15 +29,17 @@ def all_locations(tuples):
         maxv[2] = max(tpl[2], maxv[2])
         maxv[3] = max(tpl[3], maxv[3])
 
-    return range(minv[0] - 1, maxv[0] + 2), range(minv[1] - 1, maxv[1] + 2), range(minv[2] - 1, maxv[2] + 2), range(minv[3] - 1, maxv[3] + 2)
+    ranges = [range(minv[0] - 1, maxv[0] + 2), range(minv[1] - 1, maxv[1] + 2), range(minv[2] - 1, maxv[2] + 2)]
+    if skip_4d:
+        ranges.append([0])
+    else:
+        ranges.append(range(minv[3] - 1, maxv[3] + 2))
+    return itertools.product(*ranges)
 
 
 def cycle(world, skip_4d=False):
     res = {}
-    xr, yr, zr, wr = all_locations(world.keys())
-    if skip_4d:
-        wr = [0]
-    for x, y, z, w in itertools.product(xr, yr, zr, wr):
+    for x, y, z, w in all_locations(world.keys(), skip_4d):
         cnt = active_neighbors((x, y, z, w), world)
         if cnt == 3 or (cnt == 2 and world.get((x, y, z, w), 0) == 1):
             res[(x, y, z, w)] = 1
