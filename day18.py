@@ -1,77 +1,44 @@
-from operator import mul, add
 import re
+
+
+# Fake number which replaces matmul and pow operators to do addition with the side-effect that these operators
+# have either the same or higher operator precedence than mul. This way python does all the logic for me.
+# matmul (@) -> addition with same precedence as mul (*)
+# exponentiation (**) -> addition with higher precedence as mul (*)
+class FakeNum:
+    def __init__(self, num):
+        self.num = num
+
+    def __mul__(self, other):
+        return FakeNum(self.num * other.num)
+
+    def __add__(self, other):
+        return FakeNum(self.num + other.num)
+
+    def __matmul__(self, other):
+        return self + other
+
+    def __pow__(self, power, modulo=None):
+        return self + power
+
+    def __str__(self):
+        return "{}".format(self.num)
 
 
 def part1():
     terms = open("inputs/day18.txt").read().splitlines()
-    return sum(map(lambda term: compute_recursive(term)[0], terms))
+    # replace + with @ which has same precedence as *
+    terms = [re.sub(r"\+", r"@", term) for term in terms]
+    terms = [re.sub(r"(\d)", r"FakeNum(\1)", term) for term in terms]
+    return sum(map(eval, terms), FakeNum(0))
 
 
 def part2():
     terms = open("inputs/day18.txt").read().splitlines()
-    return sum(map(lambda term: eval(with_addition_paranthesis(term)), terms))
-
-
-def with_addition_paranthesis(term):
-    last_term = ""
-
-    # add paranthesis around additions until we placed them all
-    while last_term != term:
-        last_term = term
-        for m in re.finditer(r"\+", term):
-            idx = m.start()
-            start, stop = operand_idx(term, idx, -1), operand_idx(term, idx, 1) + 1
-            replacement = "(" + term[start:stop] + ")"
-
-            if replacement != term[max(start - 1, 0):min(stop + 1, len(term))]:
-                term = term[0:start] + replacement + term[stop:]
-                break
-    return term
-
-
-def extract_operation(term, operator_idx):
-    idx = operator_idx
-    return term[operand_idx(term, idx, -1): operand_idx(term, idx, 1) + 1]
-
-
-def operand_idx(term, idx, off=1):
-    brackets = 0
-    while 0 <= idx < len(term):
-        idx += off
-        char = term[idx]
-        if char == '(':
-            brackets += off
-        elif char == ')':
-            brackets -= off
-        elif char == ' ':
-            continue
-
-        if brackets == 0:
-            break
-
-    return idx
-
-
-def compute_recursive(term, idx=0):
-    acc = 0
-    op = add
-    while idx < len(term):
-        char = term[idx]
-        if char == "+":
-            op = add
-        elif char == "*":
-            op = mul
-        elif char.isdigit():
-            acc = op(acc, int(char))
-        elif char == '(':
-            operand, idx = compute_recursive(term, idx + 1)
-            acc = op(acc, operand)
-        elif char == ')':
-            break
-
-        idx += 1
-
-    return acc, idx
+    # replace + with ** which has same higher precedence as *
+    terms = [re.sub(r"\+", r"**", term) for term in terms]
+    terms = [re.sub(r"(\d)", r"FakeNum(\1)", term) for term in terms]
+    return sum(map(eval, terms), FakeNum(0))
 
 
 # 14006719520523
