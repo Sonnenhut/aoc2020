@@ -6,13 +6,14 @@ from functools import reduce, cache
 def part1():
     tiles = parse_tile("inputs/day20.txt")
     placed = place_tiles(tiles)
+    placed = {key: placed[key][0] for key in placed.keys()}
 
     maxx = max(map(lambda loc: loc[0], placed.keys()))
     maxy = max(map(lambda loc: loc[1], placed.keys()))
     minx = min(map(lambda loc: loc[0], placed.keys()))
     miny = min(map(lambda loc: loc[1], placed.keys()))
 
-    edge_nums = list(map(lambda loc: placed[loc][0], product([minx, maxx], [miny, maxy])))
+    edge_nums = list(map(lambda loc: placed[loc], product([minx, maxx], [miny, maxy])))
     return reduce(mul, edge_nums)
 
 
@@ -22,22 +23,12 @@ def part2():
                "#    ##    ##    ###",
                " #  #  #  #  #  #   "]
 
-    #image = rotate90cw(image, 1)
-
-    print("---")
-
     res = []
-    for image_rot in orientations(image):
+    for image_rot in rotations(image):
         with_monster = overlap(image_rot, monster)
         if with_monster is not None:
             res = with_monster
             break
-
-    #image = overlap(image, monster)
-    #orientations(image)
-
-    for line in res:
-        print(line)
 
     return reduce(lambda acc, l: acc + l.count('#'), res, 0)
 
@@ -144,39 +135,30 @@ def lock_tile(fixtile, tile):
     stopx = len(fixtile[0])
     stopy = len(fixtile)
 
-    north = list(zip(repeat(0), range(0, stopx)))
-    south = list(zip(repeat(stopy - 1), range(0, stopx)))
-    west = list(zip(range(0, stopy), repeat(0)))
-    east = list(zip(range(0, stopy), repeat(stopx - 1)))
-
-    fix_north = extract(fixtile, north)
-    fix_south = extract(fixtile, south)
-    fix_west = extract(fixtile, west)
-    fix_east = extract(fixtile, east)
+    north = tuple(zip(repeat(0), range(0, stopx)))
+    south = tuple(zip(repeat(stopy - 1), range(0, stopx)))
+    west = tuple(zip(range(0, stopy), repeat(0)))
+    east = tuple(zip(range(0, stopy), repeat(stopx - 1)))
 
     res = 0, 0, None
 
-    for tile_rot in orientations(tile):
-        tile_rot_north = extract(tile_rot, north)
-        tile_rot_south = extract(tile_rot, south)
-        tile_rot_west = extract(tile_rot, west)
-        tile_rot_east = extract(tile_rot, east)
-
-        if fix_north == tile_rot_south:
+    for tile_rot in rotations(tile):
+        if extract(fixtile, north) == extract(tile_rot, south):
             res = 0, -1, tile_rot
             break
-        elif fix_south == tile_rot_north:
+        elif extract(fixtile, south) == extract(tile_rot, north):
             res = 0, 1, tile_rot
             break
-        elif fix_west == tile_rot_east:
+        elif extract(fixtile, west) == extract(tile_rot, east):
             res = -1, 0, tile_rot
             break
-        elif fix_east == tile_rot_west:
+        elif extract(fixtile, east) == extract(tile_rot, west):
             res = 1, 0, tile_rot
             break
     return res
 
 
+@cache
 def extract(tile, locs):
     x = map(lambda l: l[1], locs)
     y = map(lambda l: l[0], locs)
@@ -194,7 +176,7 @@ def parse_tile(filename):
 
 
 @cache
-def orientations(tile):
+def rotations(tile):
     res = []
     flipped = tile[::-1]
     for amt in range(0, 4):
@@ -217,6 +199,5 @@ def at_loc(y, x, tile):
 
 # 17148689442341
 print(part1())
-
 # 2009
 print(part2())
