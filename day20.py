@@ -17,36 +17,44 @@ def part1():
 
 
 def part2():
-    image = image_from_input("inputs/day20t.txt")
+    image = image_from_input("inputs/day20.txt")
     monster = ["                  # ",
                "#    ##    ##    ###",
                " #  #  #  #  #  #   "]
 
-    image = rotate90cw(image, 1)
+    #image = rotate90cw(image, 1)
 
     print("---")
 
-    #image = next(image_rot for image_rot in orientations(image) if image_rot is not None)
-    image = overlap(image, monster)
+    res = []
+    for image_rot in orientations(image):
+        with_monster = overlap(image_rot, monster)
+        if with_monster is not None:
+            res = with_monster
+            break
 
-    for line in image:
+    #image = overlap(image, monster)
+    #orientations(image)
+
+    for line in res:
         print(line)
 
-    return -1
-    #for line in image:
-    #    print(line)
-    #return reduce(lambda acc, l: acc + l.count('#'), image, 0)
+    return reduce(lambda acc, l: acc + l.count('#'), res, 0)
 
 
 def overlap(image, overlay):
     res = [list(line) for line in image]
     overlay_h = len(overlay)
     overlay_w = len(overlay[0])
+    overlap_cnt = 0
     for y in range(0, len(image) - overlay_h):
         for x in range(0, len(image[0]) - overlay_w):
             with_overlay = overlap_at(res, overlay, x, y)
             if with_overlay:
+                overlap_cnt += 1
                 res = with_overlay
+    if overlap_cnt == 0:
+        res = None
     return res
 
 
@@ -90,11 +98,10 @@ def image_from_input(filename):
     res = []
     for y in range(miny, maxy + 1):
         same_y_tiles = [placed[(x, y)] for x in range(minx, maxx + 1)]
-        line_arrays = append_rows(same_y_tiles)
-        for line in line_arrays:
-            res.append("".join(line))
+        for line in append_rows(same_y_tiles):
+            res.append(tuple(line))
 
-    return res
+    return tuple(res)
 
 
 def append_rows(tiles):
@@ -211,5 +218,5 @@ def at_loc(y, x, tile):
 # 17148689442341
 print(part1())
 
-#
+# 2009
 print(part2())
