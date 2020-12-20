@@ -1,32 +1,11 @@
-from itertools import repeat, product
+from itertools import repeat, product, chain
 from operator import mul
 from functools import reduce, cache
 
 
 def part1():
     tiles = parse_tile("inputs/day20.txt")
-
-    first_tile_num = next(iter(tiles.keys()))
-    first_tile = tiles[first_tile_num]
-    placed = {(0, 0): (first_tile_num, first_tile)}
-
-    while len(placed) != len(tiles):
-        to_add = {}
-        already_placed_nums = list(map(lambda v: v[0], placed.values()))
-        for placed_idx in placed.keys():
-            _, placed_tile = placed[placed_idx]
-            placed_x, placed_y = placed_idx
-
-            for tile_num in tiles.keys():
-                if tile_num in already_placed_nums:
-                    continue
-                tile = tiles[tile_num]
-                off_x, off_y, tile_rot = place_tile(placed_tile, tile)
-                if tile_rot is not None:
-                    new_loc = (placed_x + off_x, placed_y + off_y)
-                    to_add[new_loc] = tile_num, tile_rot
-                    break
-        placed |= to_add
+    placed = place_tiles(tiles)
 
     maxx = max(map(lambda loc: loc[0], placed.keys()))
     maxy = max(map(lambda loc: loc[1], placed.keys()))
@@ -36,9 +15,79 @@ def part1():
     edge_nums = list(map(lambda loc: placed[loc][0], product([minx, maxx], [miny, maxy])))
     return reduce(mul, edge_nums)
 
+def part2():
+    image = image_from_input("inputs/day20.txt")
+    monster = ["                  # ",
+               "#    ##    ##    ###",
+               "#  #  #  #  #  #    "]
+    return None
+
+
+def image_from_input(filename):
+    tiles = parse_tile(filename)
+    placed = place_tiles(tiles)
+    # remove the ids
+    placed = {key: placed[key][1] for key in placed.keys()}
+
+    # remove borders of each tile
+    for key in placed.keys():
+        placed[key] = tuple(line[1:-1] for line in placed[key])[1:-1]
+
+    maxx = max(map(lambda loc: loc[0], placed.keys()))
+    maxy = max(map(lambda loc: loc[1], placed.keys()))
+    minx = min(map(lambda loc: loc[0], placed.keys()))
+    miny = min(map(lambda loc: loc[1], placed.keys()))
+
+    res = []
+    for y in range(miny, maxy + 1):
+        same_y_tiles = [placed[(x, y)] for x in range(minx, maxx + 1)]
+        line_arrays = append_rows(same_y_tiles)
+        for line in line_arrays:
+            res.append("".join(line))
+    res = res[::-1]
+    for line in res:
+        print(line)
+
+    return res
+
+
+def append_rows(tiles):
+    res = []
+    for y in range(0, len(tiles[0])):
+        line = []
+        for tile in tiles:
+            line += tile[y]
+        res.append(line)
+    return res
+
+
+def place_tiles(tiles):
+    first_tile_num = next(iter(tiles.keys()))
+    first_tile = tiles[first_tile_num]
+    res = {(0, 0): (first_tile_num, first_tile)}
+
+    while len(res) != len(tiles):
+        to_add = {}
+        already_placed_nums = list(map(lambda v: v[0], res.values()))
+        for placed_idx in res.keys():
+            _, placed_tile = res[placed_idx]
+            placed_x, placed_y = placed_idx
+
+            for tile_num in tiles.keys():
+                if tile_num in already_placed_nums:
+                    continue
+                tile = tiles[tile_num]
+                off_x, off_y, tile_rot = lock_tile(placed_tile, tile)
+                if tile_rot is not None:
+                    new_loc = (placed_x + off_x, placed_y + off_y)
+                    to_add[new_loc] = tile_num, tile_rot
+                    break
+        res |= to_add
+    return res
+
 
 @cache
-def place_tile(fixtile, tile):
+def lock_tile(fixtile, tile):
     stopx = len(fixtile[0])
     stopy = len(fixtile)
 
@@ -113,6 +162,8 @@ def at_loc(y, x, tile):
     return tile[y][x]
 
 
-
 # 17148689442341
 print(part1())
+
+#
+print(part2())
