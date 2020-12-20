@@ -15,12 +15,61 @@ def part1():
     edge_nums = list(map(lambda loc: placed[loc][0], product([minx, maxx], [miny, maxy])))
     return reduce(mul, edge_nums)
 
+
 def part2():
-    image = image_from_input("inputs/day20.txt")
+    image = image_from_input("inputs/day20t.txt")
     monster = ["                  # ",
                "#    ##    ##    ###",
-               "#  #  #  #  #  #    "]
-    return None
+               " #  #  #  #  #  #   "]
+
+    image = rotate90cw(image, 1)
+
+    print("---")
+
+    #image = next(image_rot for image_rot in orientations(image) if image_rot is not None)
+    image = overlap(image, monster)
+
+    for line in image:
+        print(line)
+
+    return -1
+    #for line in image:
+    #    print(line)
+    #return reduce(lambda acc, l: acc + l.count('#'), image, 0)
+
+
+def overlap(image, overlay):
+    res = [list(line) for line in image]
+    overlay_h = len(overlay)
+    overlay_w = len(overlay[0])
+    for y in range(0, len(image) - overlay_h):
+        for x in range(0, len(image[0]) - overlay_w):
+            with_overlay = overlap_at(res, overlay, x, y)
+            if with_overlay:
+                res = with_overlay
+    return res
+
+
+def overlap_at(image, overlay, x, y):
+    res = [list(line) for line in image]
+    overlay_h = len(overlay)
+    overlay_w = len(overlay[0])
+    for oy in range(0, overlay_h):
+        for ox in range(0, overlay_w):
+            original = image[y + oy][x + ox]
+            to_set = overlay[oy][ox]
+
+            if to_set == ' ':
+                newv = original
+            elif to_set == '#' and original == '#':
+                newv = 'O'
+            else:
+                # cannot place overlay!
+                return None
+
+            res[y + oy][x + ox] = newv
+
+    return res
 
 
 def image_from_input(filename):
@@ -44,9 +93,6 @@ def image_from_input(filename):
         line_arrays = append_rows(same_y_tiles)
         for line in line_arrays:
             res.append("".join(line))
-    res = res[::-1]
-    for line in res:
-        print(line)
 
     return res
 
