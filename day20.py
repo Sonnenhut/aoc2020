@@ -1,10 +1,10 @@
 from itertools import repeat, product
 from operator import mul
-from functools import reduce
+from functools import reduce, cache
 
 
 def part1():
-    tiles = parse_tile("inputs/day20t.txt")
+    tiles = parse_tile("inputs/day20.txt")
 
     first_tile_num = next(iter(tiles.keys()))
     first_tile = tiles[first_tile_num]
@@ -37,6 +37,7 @@ def part1():
     return reduce(mul, edge_nums)
 
 
+@cache
 def place_tile(fixtile, tile):
     stopx = len(fixtile[0])
     stopy = len(fixtile)
@@ -86,30 +87,31 @@ def parse_tile(filename):
     for block in blocks:
         lines = block.splitlines()
         tile_id = int(lines[0].replace(":", "").replace("Tile ", ""))
-        res[tile_id] = [list(iter(line)) for line in lines[1:]]
+        res[tile_id] = tuple(tuple(iter(line)) for line in lines[1:])
     return res
 
 
+@cache
 def orientations(tile):
+    res = []
+    flipped = tile[::-1]
     for amt in range(0, 4):
-        yield rotate90cw(tile, amt)
-        yield rotate90cw(flip(tile), amt)
-
-
-def flip(tile):
-    return tile[::-1]
+        res.append(rotate90cw(tile, amt))
+        res.append(rotate90cw(flipped, amt))
+    return res
 
 
 def rotate90cw(tile, amt=1):
     if amt == 0:
         return tile
     else:
-        res = [list(row) for row in zip(*tile[::-1])]
+        res = tuple(t for t in zip(*tile[::-1]))
         return rotate90cw(res, amt - 1)
 
 
 def at_loc(y, x, tile):
     return tile[y][x]
+
 
 
 # 17148689442341
