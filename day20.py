@@ -1,6 +1,7 @@
-from itertools import repeat, product, chain
+from itertools import repeat, product
 from operator import mul
 from functools import reduce, cache
+import re
 
 
 def part1():
@@ -19,54 +20,34 @@ def part1():
 
 def part2():
     image = image_from_input("inputs/day20.txt")
-    monster = ["                  # ",
-               "#    ##    ##    ###",
-               " #  #  #  #  #  #   "]
+    #                    #
+    #  #    ##    ##    ###
+    #   #  #  #  #  #  #
+    monster_width = 20
+    line_fill = "." * (len(image) - monster_width)
+    rgx_str = r"(..................)(#)(." + line_fill
+    rgx_str += ")(#)(....)(##)(....)(##)(....)(###)(" + line_fill
+    rgx_str += ".)(#)(..)(#)(..)(#)(..)(#)(..)(#)(..)(#)(...)"
 
-    res = []
+    monster_sub = r'\1O\3O\5OO\7OO\9OOO\11O\13O\15O\17O\19O\21O\23'
+    monster_regex = re.compile(rgx_str)
+
+    res = ""
     for image_rot in rotations(image):
-        with_monster = overlap(image_rot, monster)
-        if with_monster is not None:
-            res = with_monster
+        image_str = "".join([elem for line in image_rot for elem in line])
+        res = exhaustive_sub(monster_regex, monster_sub, image_str)
+        if image_str != res:
             break
 
     return reduce(lambda acc, l: acc + l.count('#'), res, 0)
 
 
-def overlap(image, overlay):
-    res = [list(line) for line in image]
-    overlay_h = len(overlay)
-    overlay_w = len(overlay[0])
-    overlap_cnt = 0
-    for y in range(0, len(image) - overlay_h):
-        for x in range(0, len(image[0]) - overlay_w):
-            with_overlay = overlap_at(res, overlay, x, y)
-            if with_overlay:
-                overlap_cnt += 1
-                res = with_overlay
-    if overlap_cnt == 0:
-        res = None
-    return res
-
-
-def overlap_at(image, overlay, x, y):
-    res = [list(line) for line in image]
-    overlay_h = len(overlay)
-    overlay_w = len(overlay[0])
-    for oy in range(0, overlay_h):
-        for ox in range(0, overlay_w):
-            original = image[y + oy][x + ox]
-            to_set = overlay[oy][ox]
-
-            if to_set == ' ':
-                newv = original
-            elif to_set == '#' and original == '#':
-                newv = 'O'
-            else:
-                # cannot place overlay!
-                return None
-
-            res[y + oy][x + ox] = newv
+def exhaustive_sub(regex, rgx_sub, image_str):
+    res = image_str
+    last = ""
+    while last != res:
+        last = res
+        res = regex.sub(rgx_sub, res)
 
     return res
 
