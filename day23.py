@@ -1,121 +1,87 @@
 from functools import reduce
 
-inp = [int(c) for c in "467528193"]
+inp = [int(c) for c in open("inputs/day23.txt").read().splitlines()[0]]
+#inp = [int(c) for c in "389125467"]
 
 
-def input_nodes():
-    arr = [i for i in inp]
-    first = Cup(arr[0])
-    last = reduce(lambda acc, i: acc.extend(Cup(i)), arr[1:], first)
-    return last.extend(first)
+class Game:
+    def __init__(self, arr):
+        self.world = {}
+        for key, value in zip(arr, arr[1:] + arr[0:1]):
+            self.world[key] = value
+        self.csr = arr[0]
 
+    def tick(self):
+        picked = self.take()
+        dest = self.destination(picked)
 
-class Cup:
-    def __init__(self, i):
-        self.i = i
-        self.succ = None
+        #print("taken", picked)
+        #print("destination", dest)
 
-    def extend(self, succ):
-        self.succ = succ
-        return succ
+        # slice out the taken bits
+        self.world[self.csr] = self.world[picked[-1]]
+        # and insert the taken between dest and clockwise to test
+        self.world[dest], self.world[picked[-1]] = picked[0], self.world[dest]
 
-    def destination_cup(self):
-        imapping = {self.i: self}
-        csr = self.succ
-        while csr != self:
-            imapping[csr.i] = csr
-            csr = csr.succ
+        # destination becomes cursor
+        self.csr = self.world[self.csr]
 
-        ids = list(sorted(imapping.keys()))
-        resid = ids[ids.index(self.i) - 1]
-        return imapping[resid]
+    def destination(self, ignore):
+        i = self.csr - 1
+        if i <= 0:
+            i = max(self.world.keys())#self.end
 
-    def __getitem__(self, key):
-        if isinstance(key, slice):
-            res = []
-            csr = self
-            for i in range(0, key.stop):
-                if i in range(key.start, key.stop):
-                    res += [csr]
-                csr = csr.succ
-        else:
-            res = self
-            for _ in range(key):
-                res = res.succ
+        while True:
+            if i not in ignore:
+                break
 
-        return res
+            i -= 1
+            if i <= 0:
+                i = max(self.world.keys())
+        return i
 
-    def remove(self, start, stop):
+    def take(self):
+        n1 = self.world[self.csr]
+        n2 = self.world[n1]
+        n3 = self.world[n2]
+        return [n1, n2, n3]
+
+    def labels_after_1(self, amt):
         res = []
-        csr = self
-        for i in range(0, stop):
-            if i in range(start, stop):
-                res += [csr]
-            csr = csr.succ
-        # keep the chain intact
-        res[0].prev().succ = res[-1].succ
+        csr = 1
+        while len(res) != amt:
+            res += [self.world[csr]]
+            csr = self.world[csr]
         return res
-
-    def prev(self):
-        res = self
-        while res.succ != self or res is None:
-            res = res.succ
-        return res
-
-    def all(self):
-        res = [self]
-        csr = self.succ
-        while csr != self:
-            res.append(csr)
-            csr = csr.succ
-        return res
-
-    def find(self, i):
-        csr = self
-        while i != csr.i:
-            csr = csr.succ
-        return csr
-
-    def __setitem__(self, key, value):
-        if isinstance(value, list):
-            for v in reversed(value):
-                self[key] = v
-        else:
-            prev = self[key - 1]
-            after = self[key]
-            prev.succ = value
-            value.succ = after
-
-    def __iter__(self):
-        return iter(self.all())
-
-    def __int__(self):
-        return self.i
 
     def __str__(self):
-        return str(self.i)
+        res = ["({})".format(self.csr)]
+        csr = self.csr
+        while len(res) != len(self.world.keys()):
+            res += [str(self.world[csr])]
+            csr = self.world[csr]
+        return " ".join(res)
 
-    def __repr__(self):
-        me = "({})".format(self.i)
-        other = " ".join([str(n.i) for n in self[1:9]])
-        return " ".join([me, other])
+
+def part1():
+    game = Game(inp)
+    for i in range(100):
+        game.tick()
+    return "".join(str(i) for i in game.labels_after_1(len(inp) - 1))
 
 
-def part1(moves=100):
-    csr = input_nodes()
-    for i in range(moves):
-        taken = csr.remove(1, 4)
-        dest = csr.destination_cup()
-        dest[1] = taken
-
-        csr = csr[1]
+def part2():
+    inp_patched = inp + list(range(max(inp) + 1, 1_000_001))
+    game = Game(inp_patched)
+    for i in range(10_000_000):
+        game.tick()
         if i % 1_000_000 == 0:
             print(i)
 
-    return "".join([str(n) for n in csr.find(1)]).replace("1", "")
+    return reduce(lambda acc, v: acc * v, game.labels_after_1(2))
 
 
 # 43769582
-print(part1(100))
-#
-#print(part1(10_000_000))
+print(part1())
+# 264692662390
+print(part2())
