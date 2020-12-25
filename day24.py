@@ -1,6 +1,3 @@
-from functools import reduce
-
-
 def part1():
     return len(parse_black_tiles("inputs/day24.txt"))
 
@@ -8,24 +5,23 @@ def part1():
 def part2():
     blacks = parse_black_tiles("inputs/day24.txt")
 
-    for i in range(100):
-        tiles = reduce(lambda acc, p: acc | adjacent_coords(*p), blacks, blacks)
+    for _ in range(100):
         new_blacks = blacks.copy()
-        for x, y in tiles:
-            adjacent = adjacent_coords(x, y)
+        adjacent_whites = {}
+        for x, y in blacks:
+            adjacent = set(map(lambda d: move(x, y, d), ["ne", "nw", "se", "sw", "w", "e"]))
             adjacent_black_cnt = len(blacks.intersection(adjacent))
-            if (x, y) in blacks:
-                if adjacent_black_cnt == 0 or adjacent_black_cnt > 2:
-                    new_blacks.remove((x, y))
-            else:
-                if adjacent_black_cnt == 2:
-                    new_blacks.add((x, y))
-        blacks = new_blacks
+
+            if adjacent_black_cnt == 0 or adjacent_black_cnt > 2:
+                new_blacks.remove((x, y))
+
+            # remember that all white adjacent ones have one black adjacent tile
+            for white_coord in adjacent.difference(blacks):
+                adjacent_whites[white_coord] = adjacent_whites.get(white_coord, 0) + 1
+
+        white_turn_black = {coord for coord in adjacent_whites if adjacent_whites[coord] == 2}
+        blacks = new_blacks | white_turn_black
     return len(blacks)
-
-
-def adjacent_coords(x, y):
-    return set(map(lambda d: move(x, y, d), ["ne", "nw", "se", "sw", "w", "e"]))
 
 
 def parse_black_tiles(filename):
@@ -41,7 +37,7 @@ def parse_black_tiles(filename):
     return res
 
 
-#odd-r layout
+# odd-r layout https://www.redblobgames.com/grids/hexagons/#coordinates
 def move(x, y, directions):
     if len(directions) == 0:
         return x, y
@@ -50,12 +46,8 @@ def move(x, y, directions):
         d, rest = directions[:2], directions[2:]
 
     # odd-r layout of a hexagon
-    if y % 2 == 0:
-        even = 1
-        odd = 0
-    else:
-        even = 0
-        odd = 1
+    odd = y % 2
+    even = 1 - odd
 
     if d == "nw":
         x, y = x - even, y - 1
